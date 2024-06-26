@@ -129,16 +129,23 @@ export const crearComprobante = async (req, res) => {
 
     // Obtener el arreglo de comprobantes actuales y agregar el nuevo comprobante
     let comprobantesArray = JSON.parse(proveedor.comprobantes || "[]");
+
+    // Extraer el total del comprobante
+    const totalComprobante = parseFloat(comprobante.total);
+
+    // Sumar el total del comprobante al haber actual del proveedor
+    const nuevoHaber = parseFloat(proveedor.haber) - totalComprobante;
+
     comprobantesArray.push({
       ...comprobante,
       id: comprobanteId,
       fecha: fechaActual,
     });
 
-    // Actualizar el proveedor con el nuevo arreglo de comprobantes
+    // Actualizar el proveedor con el nuevo arreglo de comprobantes y el nuevo haber
     const result = await pool.query(
-      "UPDATE proveedores SET comprobantes = $1 WHERE id = $2 RETURNING *",
-      [JSON.stringify(comprobantesArray), id]
+      "UPDATE proveedores SET comprobantes = $1, haber = $2 WHERE id = $3 RETURNING *",
+      [JSON.stringify(comprobantesArray), nuevoHaber, id]
     );
 
     proveedor = result.rows[0]; // Actualizar proveedor con los datos actualizados
@@ -152,6 +159,123 @@ export const crearComprobante = async (req, res) => {
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+// export const crearComprobante = async (req, res) => {
+//   const { id } = req.params; // ID del proveedor
+//   const { comprobante } = req.body; // Comprobante enviado desde el frontend
+
+//   try {
+//     // Generar un ID aleatorio usando uuid
+//     const comprobanteId = uuidv4();
+
+//     // Obtener la fecha actual
+//     const fechaActual = new Date().toISOString(); // Formato ISO 8601: 'YYYY-MM-DDTHH:mm:ss.sssZ'
+
+//     // Obtener el proveedor según el ID
+//     const proveedorResult = await pool.query(
+//       "SELECT * FROM proveedores WHERE id = $1",
+//       [id]
+//     );
+
+//     if (proveedorResult.rowCount === 0) {
+//       return res.status(404).json({
+//         message: "No se encontró ningún proveedor con ese ID",
+//       });
+//     }
+
+//     let proveedor = proveedorResult.rows[0];
+
+//     // Obtener el arreglo de comprobantes actuales y agregar el nuevo comprobante
+//     let comprobantesArray = JSON.parse(proveedor.comprobantes || "[]");
+//     comprobantesArray.push({
+//       ...comprobante,
+//       id: comprobanteId,
+//       fecha: fechaActual,
+//     });
+
+//     // Actualizar el proveedor con el nuevo arreglo de comprobantes
+//     const result = await pool.query(
+//       "UPDATE proveedores SET comprobantes = $1 WHERE id = $2 RETURNING *",
+//       [JSON.stringify(comprobantesArray), id]
+//     );
+
+//     proveedor = result.rows[0]; // Actualizar proveedor con los datos actualizados
+
+//     res.status(200).json({
+//       proveedorActualizado: proveedor,
+//       todosLosProveedores: result.rows, // Opcional: puedes devolver todos los proveedores actualizados
+//     });
+//   } catch (error) {
+//     console.error("Error al crear comprobante:", error);
+//     return res.status(500).json({ error: "Error interno del servidor" });
+//   }
+// };
+
+export const eliminarComprobante = async (req, res) => {
+  const { id } = req.params; // ID del proveedor
+  const { comprobanteId } = req.params; // ID del comprobante a eliminar
+
+  try {
+    // Obtener el proveedor según el ID
+    const proveedorResult = await pool.query(
+      "SELECT * FROM proveedores WHERE id = $1",
+      [id]
+    );
+
+    if (proveedorResult.rowCount === 0) {
+      return res.status(404).json({
+        message: "No se encontró ningún proveedor con ese ID",
+      });
+    }
+
+    let proveedor = proveedorResult.rows[0];
+
+    // Obtener el arreglo de comprobantes actuales
+    let comprobantesArray = JSON.parse(proveedor.comprobantes || "[]");
+
+    // Encontrar el índice del comprobante a eliminar
+    const index = comprobantesArray.findIndex(
+      (comp) => comp.id === comprobanteId
+    );
+
+    if (index === -1) {
+      return res.status(404).json({
+        message: "No se encontró ningún comprobante con ese ID",
+      });
+    }
+
+    // Obtener el comprobante a eliminar
+    const comprobanteEliminado = comprobantesArray[index];
+
+    // Calcular el total del comprobante eliminado
+    const totalEliminado = parseFloat(comprobanteEliminado.total);
+
+    // Eliminar el comprobante del arreglo
+    comprobantesArray = comprobantesArray.filter(
+      (comp) => comp.id !== comprobanteId
+    );
+
+    // Sumar el total eliminado al haber del proveedor
+    const nuevoHaber = parseFloat(proveedor.haber) + totalEliminado;
+
+    // Actualizar el proveedor con el nuevo arreglo de comprobantes y el nuevo haber
+    const result = await pool.query(
+      "UPDATE proveedores SET comprobantes = $1, haber = $2 WHERE id = $3 RETURNING *",
+      [JSON.stringify(comprobantesArray), nuevoHaber, id]
+    );
+
+    proveedor = result.rows[0]; // Actualizar proveedor con los datos actualizados
+
+    res.status(200).json({
+      proveedorActualizado: proveedor,
+      todosLosProveedores: result.rows, // Opcional: puedes devolver todos los proveedores actualizados
+    });
+  } catch (error) {
+    console.error("Error al eliminar comprobante:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 export const actualizarProveedor = async (req, res) => {
   const { id } = req.params;
 

@@ -5,6 +5,7 @@ import {
   actualizarProveedor,
   crearComprobante,
   crearProveedor,
+  eliminarComprobante,
   eliminarProveedor,
   getProveedorById,
   getProveedores,
@@ -23,5 +24,12 @@ router.put("/proveedores/:id", isAuth, isAdmin, actualizarProveedor);
 router.delete("/proveedores/:id", isAuth, isAdmin, eliminarProveedor);
 
 router.post("/proveedores/:id/comprobantes", isAuth, isAdmin, crearComprobante);
+
+router.delete(
+  "/proveedores/:id/comprobantes/:comprobanteId",
+  isAuth,
+  isAdmin,
+  eliminarComprobante
+);
 
 export default router;
