@@ -1,7 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.routes.js";
-import remuneracionRoutes from "./routes/remuneraciones.routes.js";
+import proveedoresRoutes from "./routes/proveedores.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -32,7 +32,7 @@ app.get("/api/ping", async (req, res) => {
   return res.json(result.rows[0]);
 });
 app.use("/api", authRoutes);
-app.use("/api", remuneracionRoutes);
+app.use("/api", proveedoresRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {

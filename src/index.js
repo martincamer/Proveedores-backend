@@ -21,10 +21,17 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Maneja el evento "nueva-salida"
-  socket.on("nuevo-proveedor", (datosSalida) => {
-    console.log("Nueva proveedor:", datosSalida);
-    io.emit("nueva-proveedor", datosSalida); // Esto emitirá el evento "nueva-salida" a todos los clientes conectados
+  socket.on("eliminar-proveedor", (eliminarProveedor) => {
+    io.emit("eliminar-proveedor", eliminarProveedor);
+  });
+  socket.on("nuevo-proveedor", (nuevoProveedor) => {
+    io.emit("nuevo-proveedor", nuevoProveedor);
+  });
+  socket.on("actualizar-proveedor", (actualizarProveedor) => {
+    io.emit("actualizar-proveedor", actualizarProveedor);
+  });
+  socket.on("nuevo-comprobante", (nuevoComprobante) => {
+    io.emit("nuevo-comprobante", nuevoComprobante);
   });
 });
 
