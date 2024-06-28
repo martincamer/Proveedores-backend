@@ -11,7 +11,7 @@ export const signin = async (req, res) => {
   ]);
   if (result.rowCount === 0) {
     return res.status(400).json({
-      message: "El correo no está registrado",
+      message: "El usuario no está registrado",
     });
   }
 

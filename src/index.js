@@ -33,6 +33,12 @@ io.on("connection", (socket) => {
   socket.on("nuevo-comprobante", (nuevoComprobante) => {
     io.emit("nuevo-comprobante", nuevoComprobante);
   });
+  socket.on("nueva-orden", (nuevaOrden) => {
+    io.emit("nueva-orden", nuevaOrden);
+  });
+  socket.on("eliminar-orden", (eliminarOrden) => {
+    io.emit("eliminar-orden", eliminarOrden);
+  });
 });
 
 httpServer.listen(PORT, () => {

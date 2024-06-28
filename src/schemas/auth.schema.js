@@ -28,14 +28,10 @@ export const signupSchema = z.object({
 });
 
 export const signinSchema = z.object({
-  email: z
-    .string({
-      required_error: "El email es requerido",
-      invalid_type_error: "El email debe ser un texto",
-    })
-    .email({
-      message: "El email debe ser un email valido",
-    }),
+  username: z.string({
+    required_error: "El usuario es requierdo",
+    invalid_type_error: "El usuario debe ser un texto",
+  }),
   password: z
     .string({
       required_error: "El nombre de usuario es requerido",
