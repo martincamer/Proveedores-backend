@@ -279,17 +279,19 @@ export const eliminarComprobante = async (req, res) => {
 export const actualizarProveedor = async (req, res) => {
   const { id } = req.params;
 
-  const { proveedor, localidad_proveedor, provincia_proveedor } = req.body;
+  const { proveedor, localidad_proveedor, provincia_proveedor, haber } =
+    req.body;
 
   const { username, userRole, localidad } = req;
 
   try {
     const result = await pool.query(
-      "UPDATE proveedores SET proveedor = $1, localidad_proveedor = $2, provincia_proveedor = $3, usuario = $4, role_id = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING *",
+      "UPDATE proveedores SET proveedor = $1, localidad_proveedor = $2, provincia_proveedor = $3,haber = $4 ,usuario = $5, role_id = $6, updated_at = CURRENT_TIMESTAMP WHERE id = $7 RETURNING *",
       [
         proveedor,
         localidad_proveedor,
         provincia_proveedor,
+        haber,
         username,
         userRole,
         id,
